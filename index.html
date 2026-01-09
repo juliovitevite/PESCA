@@ -25,7 +25,6 @@
         .text-editor a { color: var(--primary); text-decoration: underline; }
         .file-item img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); margin-top: 5px; }
         
-        /* DISEÑO DE BOTÓN PDF */
         .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; }
         .pdf-link:hover { background: #3d495a; }
         .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
@@ -72,10 +71,10 @@
         const modal = document.getElementById('confirmModal');
         let elementToDelete = null;
 
-        function saveData() { localStorage.setItem('bioNormas_Final_V5', grid.innerHTML); }
+        function saveData() { localStorage.setItem('bioNormas_Final_V6', grid.innerHTML); }
 
         function loadData() {
-            const saved = localStorage.getItem('bioNormas_Final_V5');
+            const saved = localStorage.getItem('bioNormas_Final_V6');
             if (saved) {
                 grid.innerHTML = saved;
                 grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
@@ -110,14 +109,16 @@
                 const originalIcon = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-                // CORRECCIÓN: Detectar tipo raw para PDFs
-                const resourceType = file.type === "application/pdf" ? "raw" : "image";
+                // SOLUCIÓN AL ERROR DE PDF: Detectar resource type
+                const isPDF = file.type === "application/pdf";
+                const resourceType = isPDF ? "raw" : "image";
 
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', UPLOAD_PRESET);
 
                 try {
+                    // URL corregida con resourceType dinámico
                     const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, { 
                         method: 'POST', 
                         body: formData 
@@ -129,7 +130,7 @@
                         const item = document.createElement('div');
                         item.className = 'file-item';
                         
-                        if (file.type === "application/pdf") {
+                        if (isPDF) {
                             item.innerHTML = `
                                 <a href="${data.secure_url}" target="_blank" class="pdf-link">
                                     <i class="fas fa-file-pdf"></i>
@@ -142,7 +143,7 @@
                         saveData();
                     }
                 } catch (err) { 
-                    alert("Error al subir. Revisa que estés en HTTPS."); 
+                    alert("Error al subir. Revisa tu conexión."); 
                 } finally {
                     btn.innerHTML = originalIcon;
                 }
