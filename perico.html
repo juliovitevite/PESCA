@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioNormas PRO - GitHub Cloud</title>
+    <title>BioNormas PRO - Gestión</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
@@ -13,8 +13,14 @@
             --color-0: #fef08a; --color-1: #4ade80; --color-2: #60a5fa; --color-3: #f87171; 
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; }
-        .header-species { width: 100%; background: linear-gradient(to bottom, #1e293b, var(--dark-bg)); padding: 10px 0; text-align: center; border-bottom: 1px solid var(--border); }
-        .header-species img { width: 30%; max-width: 130px; border-radius: 4px; }
+        
+        /* BOTÓN VOLVER */
+        .nav-header { position: absolute; top: 15px; left: 15px; z-index: 100; }
+        .btn-back { background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); }
+        
+        .header-species { width: 100%; background: linear-gradient(to bottom, #1e293b, var(--dark-bg)); padding: 25px 0 15px 0; text-align: center; border-bottom: 1px solid var(--border); }
+        .header-species img { width: 30%; max-width: 130px; border-radius: 4px; margin-top: 10px; }
+        
         .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 15px; width: 96%; margin: 20px auto; }
         .excel-table { background: var(--card-bg); border: 1px solid var(--border); position: relative; border-radius: 6px; overflow: hidden; }
         .excel-header { padding: 8px 12px; font-weight: bold; color: #000; font-size: 0.75rem; display: flex; align-items: center; }
@@ -26,7 +32,6 @@
         .file-item img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); margin-top: 5px; }
         
         .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; }
-        .pdf-link:hover { background: #3d495a; }
         .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
         .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -45,8 +50,14 @@
 </head>
 <body>
 
+    <div class="nav-header">
+        <a href="index.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i> VOLVER
+        </a>
+    </div>
+
     <div class="header-species">
-        <img src="https://mardelperu.pe/wp-content/uploads/2023/02/Coryphaena_hippurus-MACHO-SIN-ZOOM.jpg" alt="Perico">
+        <img src="https://mardelperu.pe/wp-content/uploads/2023/02/Coryphaena_hippurus-MACHO-SIN-ZOOM.jpg" alt="Especie">
         <div style="color: var(--primary); font-weight: 800; font-size: 0.75rem; margin-top:5px;">SISTEMA NORMAS PRO</div>
     </div>
 
@@ -71,10 +82,13 @@
         const modal = document.getElementById('confirmModal');
         let elementToDelete = null;
 
-        function saveData() { localStorage.setItem('bioNormas_Final_V6', grid.innerHTML); }
+        // USA EL NOMBRE DEL ARCHIVO PARA SEPARAR LOS DATOS (Ej: perico.html usa data_perico)
+        const storageKey = 'data_' + window.location.pathname.split('/').pop().split('.')[0];
+
+        function saveData() { localStorage.setItem(storageKey, grid.innerHTML); }
 
         function loadData() {
-            const saved = localStorage.getItem('bioNormas_Final_V6');
+            const saved = localStorage.getItem(storageKey);
             if (saved) {
                 grid.innerHTML = saved;
                 grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
@@ -109,7 +123,6 @@
                 const originalIcon = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-                // SOLUCIÓN AL ERROR DE PDF: Detectar resource type
                 const isPDF = file.type === "application/pdf";
                 const resourceType = isPDF ? "raw" : "image";
 
@@ -118,7 +131,6 @@
                 formData.append('upload_preset', UPLOAD_PRESET);
 
                 try {
-                    // URL corregida con resourceType dinámico
                     const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, { 
                         method: 'POST', 
                         body: formData 
