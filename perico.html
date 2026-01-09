@@ -29,7 +29,6 @@
         .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
         .text-editor a { color: var(--primary); text-decoration: underline; }
 
-        /* AJUSTE DE IMAGENES EN TABLA */
         .file-item img { 
             max-height: 120px; 
             max-width: 100%;
@@ -41,17 +40,16 @@
             object-fit: contain;
         }
         
-        /* VISOR DE IMAGEN (LIGHTBOX) */
         #imgViewer {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center;
             cursor: zoom-out;
         }
-        #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; }
 
-        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; }
+        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; cursor: pointer; }
         .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
-        .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; }
 
         .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
         .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
@@ -90,9 +88,9 @@
 
     <div id="confirmModal">
         <div class="modal-content">
-            <p>⚠️ ¿Eliminar permanentemente?</p>
+            <p id="modalText">⚠️ ¿Eliminar permanentemente?</p>
             <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
-                <button onclick="confirmDelete()" style="background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">SÍ</button>
+                <button id="btnConfirmDelete" style="background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">SÍ</button>
                 <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">NO</button>
             </div>
         </div>
@@ -103,6 +101,7 @@
         const UPLOAD_PRESET = "bio_upload";
         const grid = document.getElementById('mainGrid');
         const modal = document.getElementById('confirmModal');
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
         let elementToDelete = null;
 
         const storageKey = 'data_' + window.location.pathname.split('/').pop().split('.')[0];
@@ -117,11 +116,18 @@
             } else { addTable(); }
         }
 
-        // FUNCION PARA AMPLIAR IMAGEN
         function openImg(src) {
             document.getElementById('fullImg').src = src;
             document.getElementById('imgViewer').style.display = 'flex';
         }
+
+        // FUNCIÓN CLAVE: BORRADO POR DOBLE CLIC
+        document.addEventListener('dblclick', function(e) {
+            const target = e.target.closest('.file-item');
+            if (target) {
+                askBeforeDelete(target, "🗑️ ¿Eliminar este archivo específico?");
+            }
+        });
 
         function handleEvents(element) {
             element.addEventListener('blur', function() {
@@ -172,12 +178,11 @@
                         
                         if (isPDF) {
                             item.innerHTML = `
-                                <a href="${data.secure_url}" target="_blank" class="pdf-link">
+                                <div class="pdf-link">
                                     <i class="fas fa-file-pdf"></i>
-                                    <span>${file.name}</span>
-                                </a>`;
+                                    <span onclick="window.open('${data.secure_url}', '_blank')">${file.name}</span>
+                                </div>`;
                         } else {
-                            // Añadido onclick para abrir el visor
                             item.innerHTML = `<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
                         }
                         filesList.appendChild(item);
@@ -236,9 +241,21 @@
             saveData();
         }
 
-        function askBeforeDelete(el) { elementToDelete = el; modal.style.display = "flex"; }
+        function askBeforeDelete(el, text = "⚠️ ¿Eliminar permanentemente?") { 
+            elementToDelete = el; 
+            document.getElementById('modalText').innerText = text;
+            modal.style.display = "flex"; 
+        }
+
         function closeModal() { modal.style.display = "none"; }
-        function confirmDelete() { if (elementToDelete) { elementToDelete.remove(); saveData(); } closeModal(); }
+
+        btnConfirmDelete.onclick = function() {
+            if (elementToDelete) {
+                elementToDelete.remove();
+                saveData();
+            }
+            closeModal();
+        }
 
         new Sortable(grid, { handle: '.drag-handle', animation: 200, onEnd: saveData });
         window.onload = loadData;
