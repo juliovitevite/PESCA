@@ -25,78 +25,63 @@
         .excel-header { padding: 8px 12px; font-weight: bold; color: #000; font-size: 0.75rem; display: flex; align-items: center; }
         .drag-handle { cursor: grab; margin-right: 10px; font-size: 1.1rem; opacity: 0.6; }
 
-        /* AJUSTE DE COLUMNAS PARA QUE NO SE DESBORDE */
-        .row { 
-            display: grid; 
-            grid-template-columns: 1fr 60px; /* Columna de botones fija en 60px */
-            border-top: 1px solid var(--border); 
-            min-width: 0; /* Evita que el hijo empuje al padre */
+        .row { display: grid; grid-template-columns: 1fr 60px; border-top: 1px solid var(--border); min-width: 0; }
+        .cell-main { padding: 8px 12px; min-width: 0; }
+        
+        .text-editor { 
+            min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; 
+            word-break: break-all; white-space: pre-wrap; line-height: 1.4;
         }
-
-        .cell-main { 
-            padding: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            min-width: 0; /* Crucial para que el texto se recorte */
-        }
-
-        .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
         .text-editor a { color: var(--primary); text-decoration: underline; }
 
-        .file-item { position: relative; max-width: 100%; }
-        .file-item img { 
-            max-height: 120px; 
-            max-width: 100%;
-            border-radius: 4px; 
-            display: block; 
-            border: 1px solid var(--border); 
-            margin-top: 5px; 
-            cursor: zoom-in;
-            object-fit: contain;
+        .inline-file { 
+            position: relative; display: inline-flex; vertical-align: middle;
+            margin: 4px 0; max-width: 100%; width: 100%;
+            user-select: none; -webkit-user-select: none; 
         }
         
+        .inline-file img { 
+            max-height: 110px; max-width: 100%; border-radius: 4px; 
+            border: 1px solid var(--border); cursor: zoom-in;
+        }
+
+        /* CAJA DE ARCHIVOS (WORD, EXCEL, PPT, PDF) */
+        .file-box { 
+            display: flex; align-items: center; background: #2d3748; 
+            padding: 4px 8px; padding-right: 30px; border-radius: 4px; 
+            color: #fff; text-decoration: none; border: 1px solid #4a5568; 
+            width: 100%; box-sizing: border-box;
+        }
+        .file-box i { font-size: 1rem; margin-right: 8px; flex-shrink: 0; }
+        .file-box span { font-size: 0.7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* COLORES POR TIPO */
+        .file-pdf i { color: #ff4d4d; }
+        .file-excel i { color: #2ecc71; }
+        .file-word i { color: #3498db; }
+        .file-ppt i { color: #e67e22; }
+
+        .btn-del-inline {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,0.7); color: #fff; border: none; 
+            border-radius: 50%; width: 22px; height: 22px; font-size: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 15; border: 1px solid rgba(255,255,255,0.3);
+        }
+
         #imgViewer {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center;
-            cursor: zoom-out;
         }
         #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; }
-
-        /* RECORTE DE NOMBRE DE PDF */
-        .pdf-link { 
-            display: flex; 
-            align-items: center; 
-            background: #2d3748; 
-            padding: 10px; 
-            border-radius: 5px; 
-            color: #fff; 
-            text-decoration: none; 
-            border: 1px solid #4a5568; 
-            margin-top: 8px; 
-            transition: 0.2s;
-            overflow: hidden; /* Recorta el contenido */
-        }
-        .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; flex-shrink: 0; }
-        .pdf-link span { 
-            font-size: 0.75rem; 
-            overflow: hidden; 
-            text-overflow: ellipsis; /* Añade los "..." */
-            white-space: nowrap; /* Evita que el nombre salte a otra linea */
-        }
 
         .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
         .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
 
-        /* BOTONES DE CONTROL FIJOS */
         .cell-controls { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr; 
-            border-left: 1px solid var(--border); 
-            background: rgba(0,0,0,0.1); 
-            width: 60px; /* Ancho bloqueado */
-            flex-shrink: 0; /* Impide que se achique */
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; 
+            border-left: 1px solid var(--border); background: rgba(0,0,0,0.1); 
+            width: 60px;
         }
         .control-btn { background: none; border: 0.5px solid rgba(255,255,255,0.03); color: #475569; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
         .btn-trash:hover { color: var(--danger); }
@@ -117,9 +102,7 @@
     </div>
 
     <div class="nav-header">
-        <a href="index.html" class="btn-back">
-            <i class="fas fa-arrow-left"></i> VOLVER
-        </a>
+        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> VOLVER</a>
     </div>
 
     <div class="header-species">
@@ -133,7 +116,7 @@
 
     <div id="confirmModal">
         <div class="modal-content">
-            <p id="modalText">⚠️ ¿Eliminar permanentemente?</p>
+            <p id="modalText">⚠️ ¿Eliminar?</p>
             <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
                 <button id="btnConfirmDelete" style="background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">SÍ</button>
                 <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">NO</button>
@@ -148,6 +131,7 @@
         const modal = document.getElementById('confirmModal');
         const btnConfirmDelete = document.getElementById('btnConfirmDelete');
         let elementToDelete = null;
+        let lastRange = null;
 
         const storageKey = 'data_' + window.location.pathname.split('/').pop().split('.')[0];
 
@@ -161,85 +145,130 @@
             } else { addTable(); }
         }
 
-        function openImg(src) {
-            document.getElementById('fullImg').src = src;
-            document.getElementById('imgViewer').style.display = 'flex';
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) lastRange = sel.getRangeAt(0).cloneRange();
         }
 
-        document.addEventListener('dblclick', function(e) {
-            const fileItem = e.target.closest('.file-item');
-            if (fileItem) {
-                e.preventDefault();
-                askBeforeDelete(fileItem, "🗑️ ¿Eliminar este archivo?");
+        function linkify(element) {
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const nodesToReplace = [];
+            while(node = walker.nextNode()) {
+                if (node.parentElement.tagName !== 'A' && node.parentElement.closest('.inline-file') === null) {
+                    if (node.textContent.match(urlRegex)) nodesToReplace.push(node);
+                }
             }
-        });
-
-        function handleEvents(element) {
-            element.addEventListener('blur', function() {
-                const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-                this.innerHTML = this.innerText.replace(urlRegex, (url) => {
+            nodesToReplace.forEach(node => {
+                const parent = node.parentElement;
+                const content = node.textContent;
+                const newSpan = document.createElement('span');
+                newSpan.innerHTML = content.replace(urlRegex, (url) => {
                     let href = url.startsWith('http') ? url : 'http://' + url;
                     return `<a href="${href}" target="_blank" contenteditable="false">${url}</a>`;
                 });
-                saveData();
+                parent.replaceChild(newSpan, node);
+                while (newSpan.firstChild) parent.insertBefore(newSpan.firstChild, newSpan);
+                parent.removeChild(newSpan);
             });
+        }
+
+        function handleEvents(element) {
+            element.addEventListener('keyup', saveSelection);
+            element.addEventListener('mouseup', saveSelection);
             element.addEventListener('focus', function() {
-                if (["CATEGORÍA", "texto"].includes(this.innerText.trim())) this.innerText = "";
+                if (this.innerText.trim() === "texto" || this.innerText.trim() === "CATEGORÍA") this.innerText = "";
+            });
+            element.addEventListener('blur', function() {
+                linkify(this);
+                saveData();
             });
         }
 
         async function handleFileUpload(btn) {
-            const row = btn.closest('.row');
-            const filesList = row.querySelector('.files-list');
+            const editor = btn.closest('.row').querySelector('.text-editor');
+            editor.focus();
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = "image/*, application/pdf";
+            // AHORA ACEPTA TODO TIPO DE ARCHIVOS
+            input.accept = "*/*";
 
             input.onchange = async e => {
                 const file = e.target.files[0];
                 if (!file) return;
-                
-                const originalIcon = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-                const isPDF = file.type === "application/pdf";
-                const resourceType = isPDF ? "raw" : "image";
-
+                
+                const isImg = file.type.startsWith("image/");
+                // Cloudinary usa 'image' para imagenes y 'raw' para el resto (pdf, excel, word)
+                const folder = isImg ? 'image' : 'raw';
+                
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', UPLOAD_PRESET);
 
                 try {
-                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, { 
-                        method: 'POST', 
-                        body: formData 
+                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${folder}/upload`, { 
+                        method: 'POST', body: formData 
                     });
-                    
                     const data = await resp.json();
 
                     if (data.secure_url) {
-                        const item = document.createElement('div');
-                        item.className = 'file-item';
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'inline-file';
+                        wrapper.contentEditable = "false";
                         
-                        if (isPDF) {
-                            item.innerHTML = `
-                                <a href="${data.secure_url}" target="_blank" class="pdf-link">
-                                    <i class="fas fa-file-pdf"></i>
+                        const delBtn = `<button class="btn-del-inline" onclick="askBeforeDelete(this.parentElement, '🗑️ ¿Eliminar archivo?')">×</button>`;
+                        
+                        if (isImg) {
+                            wrapper.innerHTML = `${delBtn}<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
+                        } else {
+                            // LOGICA DE ICONOS SEGUN EXTENSION
+                            const ext = file.name.split('.').pop().toLowerCase();
+                            let icon = 'fa-file';
+                            let typeClass = '';
+
+                            if(ext === 'pdf') { icon = 'fa-file-pdf'; typeClass = 'file-pdf'; }
+                            else if(['xls','xlsx','csv'].includes(ext)) { icon = 'fa-file-excel'; typeClass = 'file-excel'; }
+                            else if(['doc','docx'].includes(ext)) { icon = 'fa-file-word'; typeClass = 'file-word'; }
+                            else if(['ppt','pptx'].includes(ext)) { icon = 'fa-file-powerpoint'; typeClass = 'file-ppt'; }
+
+                            wrapper.innerHTML = `${delBtn}
+                                <a href="${data.secure_url}" target="_blank" class="file-box ${typeClass}">
+                                    <i class="fas ${icon}"></i>
                                     <span>${file.name}</span>
                                 </a>`;
-                        } else {
-                            item.innerHTML = `<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
                         }
-                        filesList.appendChild(item);
+
+                        const sel = window.getSelection();
+                        if (lastRange) {
+                            sel.removeAllRanges();
+                            sel.addRange(lastRange);
+                        }
+                        const range = sel.getRangeAt(0);
+                        range.deleteContents();
+                        
+                        const zTop = document.createTextNode('\u200B');
+                        const zBot = document.createTextNode('\u200B');
+                        range.insertNode(zBot);
+                        range.insertNode(wrapper);
+                        range.insertNode(zTop);
+
+                        range.setStartAfter(wrapper);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
                         saveData();
                     }
-                } catch (err) { 
-                    alert("Error al subir."); 
-                } finally {
-                    btn.innerHTML = originalIcon;
-                }
+                } catch (err) { alert("Error al subir."); } 
+                finally { btn.innerHTML = '<i class="fas fa-file-import"></i>'; }
             };
             input.click();
+        }
+
+        function openImg(src) {
+            document.getElementById('fullImg').src = src;
+            document.getElementById('imgViewer').style.display = 'flex';
         }
 
         function addTable() {
@@ -266,7 +295,6 @@
             row.innerHTML = `
                 <div class="cell-main">
                     <div class="text-editor" contenteditable="true">texto</div>
-                    <div class="files-list"></div>
                 </div>
                 <div class="cell-controls">
                     <button class="control-btn" onclick="moveRow(this, -1)"><i class="fas fa-chevron-up"></i></button>
@@ -286,7 +314,7 @@
             saveData();
         }
 
-        function askBeforeDelete(el, text = "⚠️ ¿Eliminar permanentemente?") { 
+        function askBeforeDelete(el, text = "⚠️ ¿Eliminar?") { 
             elementToDelete = el; 
             document.getElementById('modalText').innerText = text;
             modal.style.display = "flex"; 
@@ -295,10 +323,7 @@
         function closeModal() { modal.style.display = "none"; }
 
         btnConfirmDelete.onclick = function() {
-            if (elementToDelete) {
-                elementToDelete.remove();
-                saveData();
-            }
+            if (elementToDelete) { elementToDelete.remove(); saveData(); }
             closeModal();
         }
 
