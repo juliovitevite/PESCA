@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioNormas PRO - GitHub Edition</title>
+    <title>BioNormas PRO - GitHub Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
             --dark-bg: #0b0f19; --card-bg: #161e2d; --border: #334155;
-            --primary: #00d2ff; --danger: #ef4444; --text-muted: #94a3b8;
+            --primary: #00d2ff; --danger: #ef4444; 
             --color-0: #fef08a; --color-1: #4ade80; --color-2: #60a5fa; --color-3: #f87171; 
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; }
@@ -24,37 +24,34 @@
         .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
         .text-editor a { color: var(--primary); text-decoration: underline; }
         .file-item img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); margin-top: 5px; }
-        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; }
+        
+        /* DISEÑO DE BOTÓN PDF */
+        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; }
+        .pdf-link:hover { background: #3d495a; }
         .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
         .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
         .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
         .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
         .cell-controls { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; border-left: 1px solid var(--border); background: rgba(0,0,0,0.1); }
         .control-btn { background: none; border: 0.5px solid rgba(255,255,255,0.03); color: #475569; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
-        .control-btn:hover { color: var(--primary); }
         .btn-trash:hover { color: var(--danger); }
-        .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: none; font-size: 16px; font-weight: bold; z-index: 10; }
+        .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 10; display: none; }
         .excel-table:hover .btn-delete-table { display: block; }
         .bg-0 { background-color: var(--color-0); } .bg-1 { background-color: var(--color-1); } .bg-2 { background-color: var(--color-2); } .bg-3 { background-color: var(--color-3); }
         #confirmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-bg); padding: 30px; border-radius: 8px; border: 1px solid var(--border); text-align: center; max-width: 320px; }
         .btn-float-add { position: fixed; bottom: 30px; right: 30px; background: #0b0f19; color: var(--primary); border: 2px dashed var(--primary); padding: 12px 24px; border-radius: 50px; font-weight: 800; cursor: pointer; z-index: 1000; }
-        .backup-controls { position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 1000; }
-        .btn-backup { background: #1e293b; color: white; border: 1px solid var(--border); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
     <div class="header-species">
         <img src="https://mardelperu.pe/wp-content/uploads/2023/02/Coryphaena_hippurus-MACHO-SIN-ZOOM.jpg" alt="Perico">
-        <div style="color: var(--primary); font-weight: 800; font-size: 0.75rem; margin-top:5px;">SISTEMA NORMAS PRO - GITHUB</div>
+        <div style="color: var(--primary); font-weight: 800; font-size: 0.75rem; margin-top:5px;">SISTEMA NORMAS PRO</div>
     </div>
 
     <div class="content-grid" id="mainGrid"></div>
-
-    <div class="backup-controls">
-        <button class="btn-backup" onclick="exportData()"><i class="fas fa-download"></i> COPIA SEGURIDAD</button>
-    </div>
 
     <button class="btn-float-add" onclick="addTable()">+ NUEVO BLOQUE</button>
 
@@ -62,8 +59,8 @@
         <div class="modal-content">
             <p>⚠️ ¿Eliminar permanentemente?</p>
             <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
-                <button onclick="confirmDelete()" style="background: var(--danger); color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">SÍ, ELIMINAR</button>
-                <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">CANCELAR</button>
+                <button onclick="confirmDelete()" style="background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">SÍ</button>
+                <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">NO</button>
             </div>
         </div>
     </div>
@@ -75,10 +72,10 @@
         const modal = document.getElementById('confirmModal');
         let elementToDelete = null;
 
-        function saveData() { localStorage.setItem('bioNormas_GH_V1', grid.innerHTML); }
+        function saveData() { localStorage.setItem('bioNormas_Final_V5', grid.innerHTML); }
 
         function loadData() {
-            const saved = localStorage.getItem('bioNormas_GH_V1');
+            const saved = localStorage.getItem('bioNormas_Final_V5');
             if (saved) {
                 grid.innerHTML = saved;
                 grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
@@ -109,24 +106,46 @@
             input.onchange = async e => {
                 const file = e.target.files[0];
                 if (!file) return;
+                
+                const originalIcon = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                // CORRECCIÓN: Detectar tipo raw para PDFs
+                const resourceType = file.type === "application/pdf" ? "raw" : "image";
 
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', UPLOAD_PRESET);
 
                 try {
-                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: formData });
+                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, { 
+                        method: 'POST', 
+                        body: formData 
+                    });
+                    
                     const data = await resp.json();
-                    const item = document.createElement('div');
-                    item.className = 'file-item';
-                    item.innerHTML = file.type === "application/pdf" 
-                        ? `<a href="${data.secure_url}" target="_blank" class="pdf-link"><i class="fas fa-file-pdf"></i><span>${file.name}</span></a>`
-                        : `<img src="${data.secure_url}">`;
-                    filesList.appendChild(item);
-                    saveData();
-                } catch (err) { alert("Error: Revisa que estés en HTTPS (GitHub Pages)"); }
-                btn.innerHTML = '<i class="fas fa-file-import"></i>';
+
+                    if (data.secure_url) {
+                        const item = document.createElement('div');
+                        item.className = 'file-item';
+                        
+                        if (file.type === "application/pdf") {
+                            item.innerHTML = `
+                                <a href="${data.secure_url}" target="_blank" class="pdf-link">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>${file.name}</span>
+                                </a>`;
+                        } else {
+                            item.innerHTML = `<img src="${data.secure_url}">`;
+                        }
+                        filesList.appendChild(item);
+                        saveData();
+                    }
+                } catch (err) { 
+                    alert("Error al subir. Revisa que estés en HTTPS."); 
+                } finally {
+                    btn.innerHTML = originalIcon;
+                }
             };
             input.click();
         }
@@ -135,8 +154,12 @@
             const table = document.createElement('div');
             table.className = 'excel-table';
             const n = Math.floor(Math.random() * 4);
-            table.innerHTML = `<button class="btn-delete-table" onclick="askBeforeDelete(this.parentElement)">×</button>
-                <div class="excel-header bg-${n}"><i class="fas fa-grip-vertical drag-handle"></i><span class="title-text" contenteditable="true">CATEGORÍA</span></div>
+            table.innerHTML = `
+                <button class="btn-delete-table" onclick="askBeforeDelete(this.parentElement)">×</button>
+                <div class="excel-header bg-${n}">
+                    <i class="fas fa-grip-vertical drag-handle"></i>
+                    <span class="title-text" contenteditable="true">CATEGORÍA</span>
+                </div>
                 <div class="rows-container"></div>
                 <div class="add-row-area"><div class="btn-add-row" onclick="addRow(this.closest('.excel-table'))">+ AÑADIR FILA</div></div>`;
             grid.appendChild(table);
@@ -148,7 +171,11 @@
             const container = table.querySelector('.rows-container');
             const row = document.createElement('div');
             row.className = 'row';
-            row.innerHTML = `<div class="cell-main"><div class="text-editor" contenteditable="true">texto</div><div class="files-list"></div></div>
+            row.innerHTML = `
+                <div class="cell-main">
+                    <div class="text-editor" contenteditable="true">texto</div>
+                    <div class="files-list"></div>
+                </div>
                 <div class="cell-controls">
                     <button class="control-btn" onclick="moveRow(this, -1)"><i class="fas fa-chevron-up"></i></button>
                     <button class="control-btn" onclick="handleFileUpload(this)"><i class="fas fa-file-import"></i></button>
@@ -171,18 +198,8 @@
         function closeModal() { modal.style.display = "none"; }
         function confirmDelete() { if (elementToDelete) { elementToDelete.remove(); saveData(); } closeModal(); }
 
-        function exportData() {
-            const data = localStorage.getItem('bioNormas_GH_V1');
-            const blob = new Blob([data], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'backup_normas.txt';
-            a.click();
-        }
-
         new Sortable(grid, { handle: '.drag-handle', animation: 200, onEnd: saveData });
         window.onload = loadData;
     </script>
 </body>
 </html>
-
