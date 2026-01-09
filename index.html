@@ -3,390 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioNormas PRO - Guardado Automático</title>
+    <title>BioNormas PRO - GitHub Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --dark-bg: #0b0f19;
-            --card-bg: #161e2d;
-            --border: #334155;
-            --primary: #00d2ff;
-            --danger: #ef4444;
-            --text-muted: #94a3b8;
-            --color-0: #fef08a; 
-            --color-1: #4ade80; 
-            --color-2: #60a5fa; 
-            --color-3: #f87171; 
+            --dark-bg: #0b0f19; --card-bg: #161e2d; --border: #334155;
+            --primary: #00d2ff; --danger: #ef4444; --text-muted: #94a3b8;
+            --color-0: #fef08a; --color-1: #4ade80; --color-2: #60a5fa; --color-3: #f87171; 
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: white;
-            margin: 0;
-            padding-bottom: 120px;
-        }
-
-        .header-species {
-            width: 100%;
-            background: linear-gradient(to bottom, #1e293b, var(--dark-bg));
-            padding: 8px 0;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; }
+        .header-species { width: 100%; background: linear-gradient(to bottom, #1e293b, var(--dark-bg)); padding: 10px 0; text-align: center; border-bottom: 1px solid var(--border); }
         .header-species img { width: 30%; max-width: 130px; border-radius: 4px; }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 12px;
-            width: 98%;
-            margin: 15px auto;
-        }
-
-        .excel-table {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            position: relative;
-            border-radius: 4px;
-        }
-
-        .excel-header {
-            padding: 6px 10px;
-            font-weight: bold;
-            color: #000;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .drag-handle { cursor: grab; margin-right: 8px; font-size: 1rem; }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 55px;
-            border-top: 1px solid var(--border);
-        }
-
-        .cell-main {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .text-editor {
-            min-height: 18px;
-            outline: none;
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            word-break: break-all;
-            white-space: pre-wrap;
-        }
-
-        .text-editor a {
-            color: #3b82f6;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .files-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .file-item img {
-            width: 100%;
-            border-radius: 3px;
-            display: block;
-            border: 1px solid var(--border);
-        }
-
-        .pdf-link {
-            display: flex;
-            align-items: center;
-            padding: 6px 0;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.75rem;
-            gap: 10px;
-        }
-
-        .add-row-area {
-            background: rgba(0,0,0,0.3);
-            min-height: 30px;
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-        }
-
-        .btn-add-row {
-            color: #475569;
-            cursor: pointer;
-            font-size: 0.65rem;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 3px;
-            width: fit-content;
-        }
-
-        .btn-add-row:hover { color: var(--primary); }
-
-        .cell-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            border-left: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-        }
-
-        .control-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: none;
-            border: 0.1px solid rgba(255,255,255,0.05);
-            color: #475569;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
-
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 15px; width: 96%; margin: 20px auto; }
+        .excel-table { background: var(--card-bg); border: 1px solid var(--border); position: relative; border-radius: 6px; overflow: hidden; }
+        .excel-header { padding: 8px 12px; font-weight: bold; color: #000; font-size: 0.75rem; display: flex; align-items: center; }
+        .drag-handle { cursor: grab; margin-right: 10px; font-size: 1.1rem; opacity: 0.6; }
+        .row { display: grid; grid-template-columns: 1fr 55px; border-top: 1px solid var(--border); }
+        .cell-main { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
+        .text-editor a { color: var(--primary); text-decoration: underline; }
+        .file-item img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); margin-top: 5px; }
+        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; }
+        .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
+        .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
+        .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
+        .cell-controls { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; border-left: 1px solid var(--border); background: rgba(0,0,0,0.1); }
+        .control-btn { background: none; border: 0.5px solid rgba(255,255,255,0.03); color: #475569; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
         .control-btn:hover { color: var(--primary); }
         .btn-trash:hover { color: var(--danger); }
-
-        #confirmModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            text-align: center;
-            max-width: 300px;
-        }
-
-        .modal-btns { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-        .btn-modal { padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-confirm { background: var(--danger); color: white; }
-        .btn-cancel { background: #475569; color: white; }
-
-        .btn-float-add {
-            position: fixed; bottom: 25px; right: 25px;
-            background: rgba(11, 15, 25, 0.95);
-            color: var(--primary); border: 2px dashed var(--primary);
-            padding: 10px 20px; border-radius: 50px;
-            font-weight: 800; cursor: pointer; z-index: 1000;
-        }
-
-        .btn-delete-table {
-            position: absolute; top: 2px; right: 2px;
-            background: transparent; 
-            color: rgba(255,255,255,0.3); 
-            border: none;
-            border-radius: 50%; width: 20px; height: 20px;
-            cursor: pointer; display: none; font-size: 14px;
-            font-weight: bold; z-index: 10;
-        }
-
+        .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: none; font-size: 16px; font-weight: bold; z-index: 10; }
         .excel-table:hover .btn-delete-table { display: block; }
-        
-        .bg-0-btn:hover { background-color: var(--color-0) !important; color: black !important; }
-        .bg-1-btn:hover { background-color: var(--color-1) !important; color: black !important; }
-        .bg-2-btn:hover { background-color: var(--color-2) !important; color: black !important; }
-        .bg-3-btn:hover { background-color: var(--color-3) !important; color: black !important; }
-
-        .bg-0 { background-color: var(--color-0); }
-        .bg-1 { background-color: var(--color-1); }
-        .bg-2 { background-color: var(--color-2); }
-        .bg-3 { background-color: var(--color-3); }
+        .bg-0 { background-color: var(--color-0); } .bg-1 { background-color: var(--color-1); } .bg-2 { background-color: var(--color-2); } .bg-3 { background-color: var(--color-3); }
+        #confirmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 8px; border: 1px solid var(--border); text-align: center; max-width: 320px; }
+        .btn-float-add { position: fixed; bottom: 30px; right: 30px; background: #0b0f19; color: var(--primary); border: 2px dashed var(--primary); padding: 12px 24px; border-radius: 50px; font-weight: 800; cursor: pointer; z-index: 1000; }
+        .backup-controls { position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 1000; }
+        .btn-backup { background: #1e293b; color: white; border: 1px solid var(--border); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
     <div class="header-species">
         <img src="https://mardelperu.pe/wp-content/uploads/2023/02/Coryphaena_hippurus-MACHO-SIN-ZOOM.jpg" alt="Perico">
-        <div style="color: var(--primary); font-weight: 800; font-size: 0.7rem; margin-top:3px;">SISTEMA NORMAS PRO</div>
+        <div style="color: var(--primary); font-weight: 800; font-size: 0.75rem; margin-top:5px;">SISTEMA NORMAS PRO - GITHUB</div>
     </div>
 
     <div class="content-grid" id="mainGrid"></div>
 
-    <button class="btn-float-add" onclick="addTable()">
-        <i class="fas fa-plus"></i> + NUEVO BLOQUE
-    </button>
+    <div class="backup-controls">
+        <button class="btn-backup" onclick="exportData()"><i class="fas fa-download"></i> COPIA SEGURIDAD</button>
+    </div>
+
+    <button class="btn-float-add" onclick="addTable()">+ NUEVO BLOQUE</button>
 
     <div id="confirmModal">
         <div class="modal-content">
-            <div style="font-size: 1.1rem; margin-bottom: 10px;">⚠️ ¿Estás seguro?</div>
-            <p style="font-size: 0.8rem; color: #94a3b8;">Los datos se borrarán permanentemente.</p>
-            <div class="modal-btns">
-                <button class="btn-modal btn-confirm" id="btnAceptar">ELIMINAR ACEPTAR</button>
-                <button class="btn-modal btn-cancel" id="btnCancelar">CANCELAR</button>
+            <p>⚠️ ¿Eliminar permanentemente?</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                <button onclick="confirmDelete()" style="background: var(--danger); color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">SÍ, ELIMINAR</button>
+                <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <script>
+        const CLOUD_NAME = "daptjbmo4";
+        const UPLOAD_PRESET = "bio_upload";
         const grid = document.getElementById('mainGrid');
         const modal = document.getElementById('confirmModal');
         let elementToDelete = null;
-        const DEFAULTS = ["CATEGORÍA", "texto"];
 
-        // GUARDADO EN LOCALSTORAGE
-        function saveData() {
-            localStorage.setItem('bioNormasData', grid.innerHTML);
-        }
+        function saveData() { localStorage.setItem('bioNormas_GH_V1', grid.innerHTML); }
 
         function loadData() {
-            const saved = localStorage.getItem('bioNormasData');
+            const saved = localStorage.getItem('bioNormas_GH_V1');
             if (saved) {
                 grid.innerHTML = saved;
-                // Reactivar eventos para elementos cargados
-                grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleLinks(el));
-                grid.querySelectorAll('.excel-table').forEach(table => {
-                    const header = table.querySelector('.excel-header');
-                    const numClass = header.classList.value.match(/bg-\d/);
-                    if(numClass) {
-                        const btn = table.querySelector('.btn-delete-table');
-                        btn.classList.add(numClass[0] + '-btn');
-                    }
-                });
-            } else {
-                addTable();
-            }
+                grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
+            } else { addTable(); }
         }
 
-        function handleLinks(element) {
+        function handleEvents(element) {
             element.addEventListener('blur', function() {
                 const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-                let content = this.innerText;
-                this.innerHTML = content.replace(urlRegex, (url) => {
+                this.innerHTML = this.innerText.replace(urlRegex, (url) => {
                     let href = url.startsWith('http') ? url : 'http://' + url;
                     return `<a href="${href}" target="_blank" contenteditable="false">${url}</a>`;
                 });
-                saveData(); // Guardar al salir de la celda
+                saveData();
             });
-
             element.addEventListener('focus', function() {
-                if (DEFAULTS.includes(this.innerText.trim())) {
-                    this.innerText = "";
-                } else {
-                    const text = this.innerText;
-                    this.innerHTML = "";
-                    this.innerText = text;
-                }
-            });
-
-            element.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    document.execCommand('insertLineBreak');
-                    e.preventDefault();
-                }
+                if (["CATEGORÍA", "texto"].includes(this.innerText.trim())) this.innerText = "";
             });
         }
 
-        function askBeforeDelete(element) {
-            elementToDelete = element;
-            modal.style.display = "flex";
-        }
-
-        document.getElementById('btnCancelar').onclick = () => { modal.style.display = "none"; elementToDelete = null; };
-        document.getElementById('btnAceptar').onclick = () => { 
-            if (elementToDelete) { 
-                elementToDelete.remove(); 
-                modal.style.display = "none"; 
-                elementToDelete = null; 
-                saveData(); 
-            } 
-        };
-
-        new Sortable(grid, { 
-            handle: '.drag-handle', 
-            animation: 200,
-            onEnd: saveData 
-        });
-
-        function addTable() {
-            const tableDiv = document.createElement('div');
-            tableDiv.className = 'excel-table';
-            const num = Math.floor(Math.random() * 4);
-            const colorClass = 'bg-' + num;
-            const btnColorClass = 'bg-' + num + '-btn';
-
-            tableDiv.innerHTML = `
-                <button class="btn-delete-table ${btnColorClass}" onclick="askBeforeDelete(this.parentElement)">×</button>
-                <div class="excel-header ${colorClass}">
-                    <i class="fas fa-grip-vertical drag-handle"></i> 
-                    <span class="title-text" contenteditable="true">CATEGORÍA</span>
-                </div>
-                <div class="rows-container"></div>
-                <div class="add-row-area">
-                    <div class="btn-add-row" onclick="addRow(this.closest('.excel-table'))">+ AÑADIR FILA</div>
-                </div>
-            `;
-            grid.appendChild(tableDiv);
-            handleLinks(tableDiv.querySelector('.title-text'));
-            addRow(tableDiv);
-            saveData();
-        }
-
-        function addRow(tableElement) {
-            const container = tableElement.querySelector('.rows-container');
-            const row = document.createElement('div');
-            row.className = 'row';
-            row.innerHTML = `
-                <div class="cell-main">
-                    <div class="text-editor" contenteditable="true">texto</div>
-                    <div class="files-list"></div>
-                </div>
-                <div class="cell-controls">
-                    <button class="control-btn" onclick="moveRow(this, -1)"><i class="fas fa-chevron-up"></i></button>
-                    <button class="control-btn" onclick="handleFile(this)"><i class="fas fa-file-import"></i></button>
-                    <button class="control-btn" onclick="moveRow(this, 1)"><i class="fas fa-chevron-down"></i></button>
-                    <button class="control-btn btn-trash" onclick="askBeforeDelete(this.closest('.row'))"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            container.appendChild(row);
-            handleLinks(row.querySelector('.text-editor'));
-            saveData();
-        }
-
-        function handleFile(btn) {
-            const cell = btn.closest('.row');
-            const filesList = cell.querySelector('.files-list');
-            const editor = cell.querySelector('.text-editor');
+        async function handleFileUpload(btn) {
+            const row = btn.closest('.row');
+            const filesList = row.querySelector('.files-list');
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = "image/*, application/pdf";
-            input.onchange = e => {
+
+            input.onchange = async e => {
                 const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = event => {
-                        if (editor.innerText.trim() === "texto") editor.innerText = "";
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'file-item';
-                        let content = file.type === "application/pdf" 
-                            ? `<a href="${event.target.result}" target="_blank" class="pdf-link"><i class="far fa-file-pdf"></i><span>${file.name.substring(0, 30)}</span></a>`
-                            : `<img src="${event.target.result}">`;
-                        fileItem.innerHTML = content;
-                        filesList.appendChild(fileItem);
-                        saveData();
-                    };
-                    reader.readAsDataURL(file);
-                }
+                if (!file) return;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+
+                try {
+                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: formData });
+                    const data = await resp.json();
+                    const item = document.createElement('div');
+                    item.className = 'file-item';
+                    item.innerHTML = file.type === "application/pdf" 
+                        ? `<a href="${data.secure_url}" target="_blank" class="pdf-link"><i class="fas fa-file-pdf"></i><span>${file.name}</span></a>`
+                        : `<img src="${data.secure_url}">`;
+                    filesList.appendChild(item);
+                    saveData();
+                } catch (err) { alert("Error: Revisa que estés en HTTPS (GitHub Pages)"); }
+                btn.innerHTML = '<i class="fas fa-file-import"></i>';
             };
             input.click();
+        }
+
+        function addTable() {
+            const table = document.createElement('div');
+            table.className = 'excel-table';
+            const n = Math.floor(Math.random() * 4);
+            table.innerHTML = `<button class="btn-delete-table" onclick="askBeforeDelete(this.parentElement)">×</button>
+                <div class="excel-header bg-${n}"><i class="fas fa-grip-vertical drag-handle"></i><span class="title-text" contenteditable="true">CATEGORÍA</span></div>
+                <div class="rows-container"></div>
+                <div class="add-row-area"><div class="btn-add-row" onclick="addRow(this.closest('.excel-table'))">+ AÑADIR FILA</div></div>`;
+            grid.appendChild(table);
+            handleEvents(table.querySelector('.title-text'));
+            addRow(table);
+        }
+
+        function addRow(table) {
+            const container = table.querySelector('.rows-container');
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = `<div class="cell-main"><div class="text-editor" contenteditable="true">texto</div><div class="files-list"></div></div>
+                <div class="cell-controls">
+                    <button class="control-btn" onclick="moveRow(this, -1)"><i class="fas fa-chevron-up"></i></button>
+                    <button class="control-btn" onclick="handleFileUpload(this)"><i class="fas fa-file-import"></i></button>
+                    <button class="control-btn" onclick="moveRow(this, 1)"><i class="fas fa-chevron-down"></i></button>
+                    <button class="control-btn btn-trash" onclick="askBeforeDelete(this.closest('.row'))"><i class="fas fa-trash"></i></button>
+                </div>`;
+            container.appendChild(row);
+            handleEvents(row.querySelector('.text-editor'));
+            saveData();
         }
 
         function moveRow(btn, dir) {
@@ -396,7 +167,22 @@
             saveData();
         }
 
+        function askBeforeDelete(el) { elementToDelete = el; modal.style.display = "flex"; }
+        function closeModal() { modal.style.display = "none"; }
+        function confirmDelete() { if (elementToDelete) { elementToDelete.remove(); saveData(); } closeModal(); }
+
+        function exportData() {
+            const data = localStorage.getItem('bioNormas_GH_V1');
+            const blob = new Blob([data], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'backup_normas.txt';
+            a.click();
+        }
+
+        new Sortable(grid, { handle: '.drag-handle', animation: 200, onEnd: saveData });
         window.onload = loadData;
     </script>
 </body>
 </html>
+
