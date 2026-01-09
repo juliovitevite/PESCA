@@ -14,7 +14,6 @@
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; }
         
-        /* BOTÓN VOLVER */
         .nav-header { position: absolute; top: 15px; left: 15px; z-index: 100; }
         .btn-back { background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); }
         
@@ -29,8 +28,27 @@
         .cell-main { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
         .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
         .text-editor a { color: var(--primary); text-decoration: underline; }
-        .file-item img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); margin-top: 5px; }
+
+        /* AJUSTE DE IMAGENES EN TABLA */
+        .file-item img { 
+            max-height: 120px; 
+            max-width: 100%;
+            border-radius: 4px; 
+            display: block; 
+            border: 1px solid var(--border); 
+            margin-top: 5px; 
+            cursor: zoom-in;
+            object-fit: contain;
+        }
         
+        /* VISOR DE IMAGEN (LIGHTBOX) */
+        #imgViewer {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center;
+            cursor: zoom-out;
+        }
+        #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
         .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; }
         .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
         .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -43,12 +61,17 @@
         .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 10; display: none; }
         .excel-table:hover .btn-delete-table { display: block; }
         .bg-0 { background-color: var(--color-0); } .bg-1 { background-color: var(--color-1); } .bg-2 { background-color: var(--color-2); } .bg-3 { background-color: var(--color-3); }
+        
         #confirmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-bg); padding: 30px; border-radius: 8px; border: 1px solid var(--border); text-align: center; max-width: 320px; }
         .btn-float-add { position: fixed; bottom: 30px; right: 30px; background: #0b0f19; color: var(--primary); border: 2px dashed var(--primary); padding: 12px 24px; border-radius: 50px; font-weight: 800; cursor: pointer; z-index: 1000; }
     </style>
 </head>
 <body>
+
+    <div id="imgViewer" onclick="this.style.display='none'">
+        <img id="fullImg" src="">
+    </div>
 
     <div class="nav-header">
         <a href="index.html" class="btn-back">
@@ -82,7 +105,6 @@
         const modal = document.getElementById('confirmModal');
         let elementToDelete = null;
 
-        // USA EL NOMBRE DEL ARCHIVO PARA SEPARAR LOS DATOS (Ej: perico.html usa data_perico)
         const storageKey = 'data_' + window.location.pathname.split('/').pop().split('.')[0];
 
         function saveData() { localStorage.setItem(storageKey, grid.innerHTML); }
@@ -93,6 +115,12 @@
                 grid.innerHTML = saved;
                 grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
             } else { addTable(); }
+        }
+
+        // FUNCION PARA AMPLIAR IMAGEN
+        function openImg(src) {
+            document.getElementById('fullImg').src = src;
+            document.getElementById('imgViewer').style.display = 'flex';
         }
 
         function handleEvents(element) {
@@ -149,7 +177,8 @@
                                     <span>${file.name}</span>
                                 </a>`;
                         } else {
-                            item.innerHTML = `<img src="${data.secure_url}">`;
+                            // Añadido onclick para abrir el visor
+                            item.innerHTML = `<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
                         }
                         filesList.appendChild(item);
                         saveData();
