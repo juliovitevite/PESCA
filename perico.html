@@ -12,7 +12,7 @@
             --primary: #00d2ff; --danger: #ef4444; 
             --color-0: #fef08a; --color-1: #4ade80; --color-2: #60a5fa; --color-3: #f87171; 
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; overflow-x: hidden; }
         
         .nav-header { position: absolute; top: 15px; left: 15px; z-index: 100; }
         .btn-back { background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); }
@@ -20,15 +20,31 @@
         .header-species { width: 100%; background: linear-gradient(to bottom, #1e293b, var(--dark-bg)); padding: 25px 0 15px 0; text-align: center; border-bottom: 1px solid var(--border); }
         .header-species img { width: 30%; max-width: 130px; border-radius: 4px; margin-top: 10px; }
         
-        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 15px; width: 96%; margin: 20px auto; }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; width: 96%; margin: 20px auto; }
         .excel-table { background: var(--card-bg); border: 1px solid var(--border); position: relative; border-radius: 6px; overflow: hidden; }
         .excel-header { padding: 8px 12px; font-weight: bold; color: #000; font-size: 0.75rem; display: flex; align-items: center; }
         .drag-handle { cursor: grab; margin-right: 10px; font-size: 1.1rem; opacity: 0.6; }
-        .row { display: grid; grid-template-columns: 1fr 55px; border-top: 1px solid var(--border); }
-        .cell-main { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* AJUSTE DE COLUMNAS PARA QUE NO SE DESBORDE */
+        .row { 
+            display: grid; 
+            grid-template-columns: 1fr 60px; /* Columna de botones fija en 60px */
+            border-top: 1px solid var(--border); 
+            min-width: 0; /* Evita que el hijo empuje al padre */
+        }
+
+        .cell-main { 
+            padding: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            min-width: 0; /* Crucial para que el texto se recorte */
+        }
+
         .text-editor { min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; word-break: break-all; white-space: pre-wrap; }
         .text-editor a { color: var(--primary); text-decoration: underline; }
 
+        .file-item { position: relative; max-width: 100%; }
         .file-item img { 
             max-height: 120px; 
             max-width: 100%;
@@ -47,15 +63,44 @@
         }
         #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; }
 
-        .pdf-link { display: flex; align-items: center; background: #2d3748; padding: 10px; border-radius: 5px; color: #fff; text-decoration: none; border: 1px solid #4a5568; margin-top: 8px; transition: 0.2s; cursor: pointer; }
-        .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; }
-        .pdf-link span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; }
+        /* RECORTE DE NOMBRE DE PDF */
+        .pdf-link { 
+            display: flex; 
+            align-items: center; 
+            background: #2d3748; 
+            padding: 10px; 
+            border-radius: 5px; 
+            color: #fff; 
+            text-decoration: none; 
+            border: 1px solid #4a5568; 
+            margin-top: 8px; 
+            transition: 0.2s;
+            overflow: hidden; /* Recorta el contenido */
+        }
+        .pdf-link i { color: #ff4d4d; font-size: 1.3rem; margin-right: 12px; flex-shrink: 0; }
+        .pdf-link span { 
+            font-size: 0.75rem; 
+            overflow: hidden; 
+            text-overflow: ellipsis; /* Añade los "..." */
+            white-space: nowrap; /* Evita que el nombre salte a otra linea */
+        }
 
         .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
         .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
-        .cell-controls { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; border-left: 1px solid var(--border); background: rgba(0,0,0,0.1); }
+
+        /* BOTONES DE CONTROL FIJOS */
+        .cell-controls { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 1fr 1fr; 
+            border-left: 1px solid var(--border); 
+            background: rgba(0,0,0,0.1); 
+            width: 60px; /* Ancho bloqueado */
+            flex-shrink: 0; /* Impide que se achique */
+        }
         .control-btn { background: none; border: 0.5px solid rgba(255,255,255,0.03); color: #475569; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
         .btn-trash:hover { color: var(--danger); }
+        
         .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 10; display: none; }
         .excel-table:hover .btn-delete-table { display: block; }
         .bg-0 { background-color: var(--color-0); } .bg-1 { background-color: var(--color-1); } .bg-2 { background-color: var(--color-2); } .bg-3 { background-color: var(--color-3); }
@@ -121,11 +166,11 @@
             document.getElementById('imgViewer').style.display = 'flex';
         }
 
-        // FUNCIÓN CLAVE: BORRADO POR DOBLE CLIC
         document.addEventListener('dblclick', function(e) {
-            const target = e.target.closest('.file-item');
-            if (target) {
-                askBeforeDelete(target, "🗑️ ¿Eliminar este archivo específico?");
+            const fileItem = e.target.closest('.file-item');
+            if (fileItem) {
+                e.preventDefault();
+                askBeforeDelete(fileItem, "🗑️ ¿Eliminar este archivo?");
             }
         });
 
@@ -178,10 +223,10 @@
                         
                         if (isPDF) {
                             item.innerHTML = `
-                                <div class="pdf-link">
+                                <a href="${data.secure_url}" target="_blank" class="pdf-link">
                                     <i class="fas fa-file-pdf"></i>
-                                    <span onclick="window.open('${data.secure_url}', '_blank')">${file.name}</span>
-                                </div>`;
+                                    <span>${file.name}</span>
+                                </a>`;
                         } else {
                             item.innerHTML = `<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
                         }
@@ -189,7 +234,7 @@
                         saveData();
                     }
                 } catch (err) { 
-                    alert("Error al subir. Revisa tu conexión."); 
+                    alert("Error al subir."); 
                 } finally {
                     btn.innerHTML = originalIcon;
                 }
