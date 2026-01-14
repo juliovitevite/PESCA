@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioNormas PRO - Gestión</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --dark-bg: #0b0f19; --card-bg: #161e2d; --border: #334155;
+            --primary: #00d2ff; --danger: #ef4444; 
+            --color-0: #fef08a; --color-1: #4ade80; --color-2: #60a5fa; --color-3: #f87171; 
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; padding-bottom: 120px; overflow-x: hidden; }
+        
+        .nav-header { position: absolute; top: 15px; left: 15px; z-index: 100; }
+        .btn-back { background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); }
+        
+        .header-species { width: 100%; background: linear-gradient(to bottom, #1e293b, var(--dark-bg)); padding: 25px 0 15px 0; text-align: center; border-bottom: 1px solid var(--border); }
+        .header-species img { width: 30%; max-width: 130px; border-radius: 4px; margin-top: 10px; }
+        
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; width: 96%; margin: 20px auto; }
+        .excel-table { background: var(--card-bg); border: 1px solid var(--border); position: relative; border-radius: 6px; overflow: hidden; }
+        .excel-header { padding: 8px 12px; font-weight: bold; color: #000; font-size: 0.75rem; display: flex; align-items: center; }
+        .drag-handle { cursor: grab; margin-right: 10px; font-size: 1.1rem; opacity: 0.6; }
 
+        .row { display: grid; grid-template-columns: 1fr 60px; border-top: 1px solid var(--border); min-width: 0; }
+        .cell-main { padding: 8px 12px; min-width: 0; }
+        
+        .text-editor { 
+            min-height: 20px; outline: none; font-size: 0.85rem; color: #cbd5e1; 
+            word-break: break-all; white-space: pre-wrap; line-height: 1.4;
+        }
+        .text-editor a { color: var(--primary); text-decoration: underline; }
+
+        .inline-file { 
+            position: relative; display: inline-flex; vertical-align: middle;
+            margin: 4px 0; max-width: 100%; width: 100%;
+            user-select: none; -webkit-user-select: none; 
+        }
+        
+        .inline-file img { 
+            max-height: 110px; max-width: 100%; border-radius: 4px; 
+            border: 1px solid var(--border); cursor: zoom-in;
+        }
+
+        /* CAJA DE ARCHIVOS (WORD, EXCEL, PPT, PDF) */
+        .file-box { 
+            display: flex; align-items: center; background: #2d3748; 
+            padding: 4px 8px; padding-right: 30px; border-radius: 4px; 
+            color: #fff; text-decoration: none; border: 1px solid #4a5568; 
+            width: 100%; box-sizing: border-box;
+        }
+        .file-box i { font-size: 1rem; margin-right: 8px; flex-shrink: 0; }
+        .file-box span { font-size: 0.7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* COLORES POR TIPO */
+        .file-pdf i { color: #ff4d4d; }
+        .file-excel i { color: #2ecc71; }
+        .file-word i { color: #3498db; }
+        .file-ppt i { color: #e67e22; }
+
+        .btn-del-inline {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,0.7); color: #fff; border: none; 
+            border-radius: 50%; width: 22px; height: 22px; font-size: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 15; border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #imgViewer {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center;
+        }
+        #imgViewer img { max-width: 95%; max-height: 90%; border-radius: 8px; }
+
+        .add-row-area { background: rgba(0,0,0,0.2); padding: 8px 12px; }
+        .btn-add-row { color: #64748b; cursor: pointer; font-size: 0.7rem; font-weight: bold; width: fit-content; }
+
+        .cell-controls { 
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; 
+            border-left: 1px solid var(--border); background: rgba(0,0,0,0.1); 
+            width: 60px;
+        }
+        .control-btn { background: none; border: 0.5px solid rgba(255,255,255,0.03); color: #475569; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+        .btn-trash:hover { color: var(--danger); }
+        
+        .btn-delete-table { position: absolute; top: 4px; right: 4px; background: transparent; color: rgba(0,0,0,0.4); border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 10; display: none; }
+        .excel-table:hover .btn-delete-table { display: block; }
+        .bg-0 { background-color: var(--color-0); } .bg-1 { background-color: var(--color-1); } .bg-2 { background-color: var(--color-2); } .bg-3 { background-color: var(--color-3); }
+        
+        #confirmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 8px; border: 1px solid var(--border); text-align: center; max-width: 320px; }
+        .btn-float-add { position: fixed; bottom: 30px; right: 30px; background: #0b0f19; color: var(--primary); border: 2px dashed var(--primary); padding: 12px 24px; border-radius: 50px; font-weight: 800; cursor: pointer; z-index: 1000; }
+    </style>
+</head>
+<body>
+
+    <div id="imgViewer" onclick="this.style.display='none'">
+        <img id="fullImg" src="">
+    </div>
+
+    <div class="nav-header">
+        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> VOLVER</a>
+    </div>
+
+    <div class="header-species">
+        <img src="https://www.anguilaperuana.com/wp-content/uploads/2022/06/logo-anguila-500x500-1.png" alt="Especie">
+        <div style="color: var(--primary); font-weight: 800; font-size: 0.75rem; margin-top:5px;">ANGUILA</div>
+    </div>
+
+    <div class="content-grid" id="mainGrid"></div>
+
+    <button class="btn-float-add" onclick="addTable()">+ NUEVO BLOQUE</button>
+
+    <div id="confirmModal">
+        <div class="modal-content">
+            <p id="modalText">⚠️ ¿Eliminar?</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                <button id="btnConfirmDelete" style="background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">SÍ</button>
+                <button onclick="closeModal()" style="background: #475569; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">NO</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CLOUD_NAME = "daptjbmo4";
+        const UPLOAD_PRESET = "bio_upload";
+        const grid = document.getElementById('mainGrid');
+        const modal = document.getElementById('confirmModal');
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+        let elementToDelete = null;
+        let lastRange = null;
+
+        const storageKey = 'data_' + window.location.pathname.split('/').pop().split('.')[0];
+
+        function saveData() { localStorage.setItem(storageKey, grid.innerHTML); }
+
+        function loadData() {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                grid.innerHTML = saved;
+                grid.querySelectorAll('.text-editor, .title-text').forEach(el => handleEvents(el));
+            } else { addTable(); }
+        }
+
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) lastRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        function linkify(element) {
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const nodesToReplace = [];
+            while(node = walker.nextNode()) {
+                if (node.parentElement.tagName !== 'A' && node.parentElement.closest('.inline-file') === null) {
+                    if (node.textContent.match(urlRegex)) nodesToReplace.push(node);
+                }
+            }
+            nodesToReplace.forEach(node => {
+                const parent = node.parentElement;
+                const content = node.textContent;
+                const newSpan = document.createElement('span');
+                newSpan.innerHTML = content.replace(urlRegex, (url) => {
+                    let href = url.startsWith('http') ? url : 'http://' + url;
+                    return `<a href="${href}" target="_blank" contenteditable="false">${url}</a>`;
+                });
+                parent.replaceChild(newSpan, node);
+                while (newSpan.firstChild) parent.insertBefore(newSpan.firstChild, newSpan);
+                parent.removeChild(newSpan);
+            });
+        }
+
+        function handleEvents(element) {
+            element.addEventListener('keyup', saveSelection);
+            element.addEventListener('mouseup', saveSelection);
+            element.addEventListener('focus', function() {
+                if (this.innerText.trim() === "texto" || this.innerText.trim() === "CATEGORÍA") this.innerText = "";
+            });
+            element.addEventListener('blur', function() {
+                linkify(this);
+                saveData();
+            });
+        }
+
+        async function handleFileUpload(btn) {
+            const editor = btn.closest('.row').querySelector('.text-editor');
+            editor.focus();
+            const input = document.createElement('input');
+            input.type = 'file';
+            // AHORA ACEPTA TODO TIPO DE ARCHIVOS
+            input.accept = "*/*";
+
+            input.onchange = async e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const isImg = file.type.startsWith("image/");
+                // Cloudinary usa 'image' para imagenes y 'raw' para el resto (pdf, excel, word)
+                const folder = isImg ? 'image' : 'raw';
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+
+                try {
+                    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${folder}/upload`, { 
+                        method: 'POST', body: formData 
+                    });
+                    const data = await resp.json();
+
+                    if (data.secure_url) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'inline-file';
+                        wrapper.contentEditable = "false";
+                        
+                        const delBtn = `<button class="btn-del-inline" onclick="askBeforeDelete(this.parentElement, '🗑️ ¿Eliminar archivo?')">×</button>`;
+                        
+                        if (isImg) {
+                            wrapper.innerHTML = `${delBtn}<img src="${data.secure_url}" onclick="openImg('${data.secure_url}')">`;
+                        } else {
+                            // LOGICA DE ICONOS SEGUN EXTENSION
+                            const ext = file.name.split('.').pop().toLowerCase();
+                            let icon = 'fa-file';
+                            let typeClass = '';
+
+                            if(ext === 'pdf') { icon = 'fa-file-pdf'; typeClass = 'file-pdf'; }
+                            else if(['xls','xlsx','csv'].includes(ext)) { icon = 'fa-file-excel'; typeClass = 'file-excel'; }
+                            else if(['doc','docx'].includes(ext)) { icon = 'fa-file-word'; typeClass = 'file-word'; }
+                            else if(['ppt','pptx'].includes(ext)) { icon = 'fa-file-powerpoint'; typeClass = 'file-ppt'; }
+
+                            wrapper.innerHTML = `${delBtn}
+                                <a href="${data.secure_url}" target="_blank" class="file-box ${typeClass}">
+                                    <i class="fas ${icon}"></i>
+                                    <span>${file.name}</span>
+                                </a>`;
+                        }
+
+                        const sel = window.getSelection();
+                        if (lastRange) {
+                            sel.removeAllRanges();
+                            sel.addRange(lastRange);
+                        }
+                        const range = sel.getRangeAt(0);
+                        range.deleteContents();
+                        
+                        const zTop = document.createTextNode('\u200B');
+                        const zBot = document.createTextNode('\u200B');
+                        range.insertNode(zBot);
+                        range.insertNode(wrapper);
+                        range.insertNode(zTop);
+
+                        range.setStartAfter(wrapper);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        saveData();
+                    }
+                } catch (err) { alert("Error al subir."); } 
+                finally { btn.innerHTML = '<i class="fas fa-file-import"></i>'; }
+            };
+            input.click();
+        }
+
+        function openImg(src) {
+            document.getElementById('fullImg').src = src;
+            document.getElementById('imgViewer').style.display = 'flex';
+        }
+
+        function addTable() {
+            const table = document.createElement('div');
+            table.className = 'excel-table';
+            const n = Math.floor(Math.random() * 4);
+            table.innerHTML = `
+                <button class="btn-delete-table" onclick="askBeforeDelete(this.parentElement)">×</button>
+                <div class="excel-header bg-${n}">
+                    <i class="fas fa-grip-vertical drag-handle"></i>
+                    <span class="title-text" contenteditable="true">CATEGORÍA</span>
+                </div>
+                <div class="rows-container"></div>
+                <div class="add-row-area"><div class="btn-add-row" onclick="addRow(this.closest('.excel-table'))">+ AÑADIR FILA</div></div>`;
+            grid.appendChild(table);
+            handleEvents(table.querySelector('.title-text'));
+            addRow(table);
+        }
+
+        function addRow(table) {
+            const container = table.querySelector('.rows-container');
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = `
+                <div class="cell-main">
+                    <div class="text-editor" contenteditable="true">texto</div>
+                </div>
+                <div class="cell-controls">
+                    <button class="control-btn" onclick="moveRow(this, -1)"><i class="fas fa-chevron-up"></i></button>
+                    <button class="control-btn" onclick="handleFileUpload(this)"><i class="fas fa-file-import"></i></button>
+                    <button class="control-btn" onclick="moveRow(this, 1)"><i class="fas fa-chevron-down"></i></button>
+                    <button class="control-btn btn-trash" onclick="askBeforeDelete(this.closest('.row'))"><i class="fas fa-trash"></i></button>
+                </div>`;
+            container.appendChild(row);
+            handleEvents(row.querySelector('.text-editor'));
+            saveData();
+        }
+
+        function moveRow(btn, dir) {
+            const row = btn.closest('.row');
+            if (dir === -1 && row.previousElementSibling) row.parentNode.insertBefore(row, row.previousElementSibling);
+            if (dir === 1 && row.nextElementSibling) row.parentNode.insertBefore(row.nextElementSibling, row);
+            saveData();
+        }
+
+        function askBeforeDelete(el, text = "⚠️ ¿Eliminar?") { 
+            elementToDelete = el; 
+            document.getElementById('modalText').innerText = text;
+            modal.style.display = "flex"; 
+        }
+
+        function closeModal() { modal.style.display = "none"; }
+
+        btnConfirmDelete.onclick = function() {
+            if (elementToDelete) { elementToDelete.remove(); saveData(); }
+            closeModal();
+        }
+
+        new Sortable(grid, { handle: '.drag-handle', animation: 200, onEnd: saveData });
+        window.onload = loadData;
+    </script>
+</body>
+</html>
